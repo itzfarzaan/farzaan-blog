@@ -1,11 +1,15 @@
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
 export function formatDate(value) {
     if (!value) {
         return 'Unpublished';
     }
 
-    return new Intl.DateTimeFormat('en-US', {
-        dateStyle: 'long',
-    }).format(new Date(value));
+    const date = new Date(value);
+    const month = MONTHS[date.getMonth()];
+    const day = String(date.getDate()).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${month} ${day}, ${year}`;
 }
 
 export function buildExcerpt(content) {

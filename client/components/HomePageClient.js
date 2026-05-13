@@ -1,34 +1,36 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
+import IntroBand from './IntroBand';
 import { fetchApi } from '../lib/api';
 import { formatDate } from '../lib/content';
 
-function PostCard({ post }) {
+function PostRow({ post }) {
     return (
-        <article className="post-card">
-            <div className="post-card__meta">
-                <time dateTime={post.published_at}>{formatDate(post.published_at)}</time>
-                <span>{post.reading_time_minutes} min read</span>
+        <article className="post-row">
+            <time className="post-row__date" dateTime={post.published_at}>
+                {formatDate(post.published_at)}
+            </time>
+            <div className="post-row__body">
+                <a className="post-row__title" href={`/posts/${post.slug}`}>{post.title}</a>
+                <span className="post-row__meta">a {post.reading_time_minutes} minute{post.reading_time_minutes === 1 ? '' : 's'} read</span>
             </div>
-            <h3>
-                <a href={`/posts/${post.slug}`}>{post.title}</a>
-            </h3>
-            <p className="post-card__excerpt">{post.excerpt}</p>
-            {post.tags?.length ? (
-                <div className="tag-row">
-                    {post.tags.map((tag) => (
-                        <span key={tag.slug || tag.name} className="tag">
-                            {tag.name}
-                        </span>
-                    ))}
-                </div>
-            ) : null}
         </article>
     );
 }
 
-export default function HomePageClient({ initialPosts, initialFeatured, tags }) {
+function FeaturedRow({ post }) {
+    return (
+        <div className="featured-row">
+            <a className="featured-row__title" href={`/posts/${post.slug}`}>{post.title}</a>
+            <span className="featured-row__meta">
+                {formatDate(post.published_at)} · {post.reading_time_minutes} min
+            </span>
+        </div>
+    );
+}
+
+export default function HomePageClient({ initialPosts, initialFeatured }) {
     const [query, setQuery] = useState('');
     const [posts, setPosts] = useState(initialPosts);
     const [isSearching, setIsSearching] = useState(false);
@@ -65,81 +67,35 @@ export default function HomePageClient({ initialPosts, initialFeatured, tags }) 
         };
     }, [query, initialPosts]);
 
-    const featured = useMemo(() => {
-        if (query.trim()) {
-            return posts.filter((post) => post.is_featured);
-        }
-
-        return initialFeatured;
-    }, [initialFeatured, posts, query]);
+    const isSearchActive = Boolean(query.trim());
 
     return (
         <>
-            <section className="hero-card">
-                <h2>Words for the long road.</h2>
-                <p>
-                    A quiet place for essays, field notes, code-heavy writeups, and the occasional useful rabbit hole.
-                    Posts support Markdown, images, links, tables, and downloadable resources.
-                </p>
-            </section>
+            <IntroBand query={query} onQueryChange={setQuery} isSearching={isSearching} />
 
-            <section className="home-grid">
-                <div className="panel">
-                    <div className="search-box">
-                        <label htmlFor="search">Search posts</label>
-                        <input
-                            id="search"
-                            className="input"
-                            placeholder="Search by title or content"
-                            value={query}
-                            onChange={(event) => setQuery(event.target.value)}
-                        />
-                        {isSearching ? <span className="muted">Searching...</span> : null}
-                        {error ? <div className="notice error">{error}</div> : null}
-                    </div>
+            {error ? <div className="notice error" style={{ marginBottom: '1rem' }}>{error}</div> : null}
 
-                    <div className="posts-stack">
-                        {posts.map((post) => (
-                            <PostCard key={post.id} post={post} />
-                        ))}
-                        {!posts.length ? (
-                            <div className="notice">
-                                {query.trim() ? 'No published posts matched that search.' : 'No published posts yet.'}
-                            </div>
-                        ) : null}
-                    </div>
+            <div className="home-grid">
+                <div className="posts-list">
+                    {posts.map((post) => (
+                        <PostRow key={post.id} post={post} />
+                    ))}
+                    {!posts.length ? (
+                        <div className="posts-empty">
+                            {isSearchActive ? 'No posts matched that search.' : 'No published posts yet.'}
+                        </div>
+                    ) : null}
                 </div>
 
-                <aside className="panel stack">
-                    <div>
-                        <h3>Featured</h3>
-                        <div className="featured-list">
-                            {featured.map((post) => (
-                                <div key={post.id} className="featured-item">
-                                    <a href={`/posts/${post.slug}`}>{post.title}</a>
-                                    <div className="post-card__meta">
-                                        <span>{formatDate(post.published_at)}</span>
-                                        <span>{post.reading_time_minutes} min read</span>
-                                    </div>
-                                </div>
-                            ))}
-                            {!featured.length ? <span className="muted">No featured posts yet.</span> : null}
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3>Topics</h3>
-                        <div className="tag-row">
-                            {tags.map((tag) => (
-                                <span key={tag.slug} className="tag">
-                                    {tag.name} - {tag.post_count}
-                                </span>
-                            ))}
-                            {!tags.length ? <span className="muted">Tags will appear here after publishing posts.</span> : null}
-                        </div>
-                    </div>
+                <aside className="featured">
+                    <span className="featured__label">Featured</span>
+                    {initialFeatured.length ? (
+                        initialFeatured.map((post) => <FeaturedRow key={post.id} post={post} />)
+                    ) : (
+                        <span className="posts-empty">Nothing featured yet.</span>
+                    )}
                 </aside>
-            </section>
+            </div>
         </>
     );
 }
