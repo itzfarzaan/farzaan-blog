@@ -9,7 +9,10 @@ export function getClientApiBaseUrl() {
 }
 
 export async function fetchApi(path, options = {}) {
-    const response = await fetch(`${getClientApiBaseUrl()}${path}`, options);
+    const response = await fetch(`${getClientApiBaseUrl()}${path}`, {
+        credentials: 'include',
+        ...options,
+    });
     let payload = null;
 
     try {

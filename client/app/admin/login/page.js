@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchApi } from '../../../lib/api';
-import { setToken } from '../../../lib/admin-auth';
 import AdminNavbar from '../../../components/admin/AdminNavbar';
 
 export default function AdminLoginPage() {
@@ -19,7 +18,7 @@ export default function AdminLoginPage() {
         try {
             setLoading(true);
             setError('');
-            const response = await fetchApi('/auth/login', {
+            await fetchApi('/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -27,7 +26,6 @@ export default function AdminLoginPage() {
                 body: JSON.stringify({ username, password }),
             });
 
-            setToken(response.token);
             router.replace('/admin/posts');
         } catch (loginError) {
             setError(loginError.message || 'Sign-in failed. Try again.');

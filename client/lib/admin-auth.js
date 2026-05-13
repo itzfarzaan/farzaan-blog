@@ -1,17 +1,9 @@
-const TOKEN_KEY = 'farzaan_blog_admin_token';
+import { fetchApi } from './api';
 
-export function getToken() {
-    if (typeof window === 'undefined') {
-        return null;
+export async function signOut() {
+    try {
+        await fetchApi('/auth/logout', { method: 'POST' });
+    } catch (error) {
+        // best-effort; cookie may already be expired
     }
-
-    return window.localStorage.getItem(TOKEN_KEY);
-}
-
-export function setToken(token) {
-    window.localStorage.setItem(TOKEN_KEY, token);
-}
-
-export function clearToken() {
-    window.localStorage.removeItem(TOKEN_KEY);
 }
