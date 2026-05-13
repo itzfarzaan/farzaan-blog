@@ -1,6 +1,7 @@
 export const siteConfig = {
     name: 'Farzaan Ali',
-    intro: 'Hi, I am Farzaan Ali. These are the blogs I write whenever I come across fascinating topics, ideas, and the occasional rabbit hole worth keeping.',
+    heading: 'Hi, I am Farzaan Ali',
+    intro: 'These are the blogs I write whenever I come across fascinating topics, ideas, and the occasional rabbit hole worth keeping.',
     avatarSrc: '/avatar.png',
     portfolioUrl: 'https://farzaanali.com',
     socials: [
