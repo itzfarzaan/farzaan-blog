@@ -1,20 +1,17 @@
-export default function SiteHeader({ adminLink = false }) {
+import ThemeToggle from './ThemeToggle';
+import { siteConfig } from '../lib/site-config';
+
+export default function SiteHeader() {
     return (
-        <header className="site-header">
-            <div className="site-header__brand">
-                <span className="muted">blog.farzaanali.com</span>
-                <h1 className="site-header__title">
-                    <a href="/">Farzaan Ali</a>
-                </h1>
-                <span className="site-header__subtitle">
-                    Essays, notes, experiments, and things worth keeping.
-                </span>
-            </div>
-            {adminLink ? (
-                <a className="pill-link" href="/admin/posts">
-                    Admin
+        <header className="navbar">
+            <a className="navbar__brand" href="/">{siteConfig.name}</a>
+            <nav className="navbar__right">
+                <a className="navbar__link" href={siteConfig.portfolioUrl} target="_blank" rel="noreferrer">
+                    Portfolio
                 </a>
-            ) : null}
+                <span className="navbar__sep" aria-hidden="true">·</span>
+                <ThemeToggle />
+            </nav>
         </header>
     );
 }

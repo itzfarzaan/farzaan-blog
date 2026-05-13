@@ -1,4 +1,5 @@
 import SiteHeader from '../../../components/SiteHeader';
+import SiteFooter from '../../../components/SiteFooter';
 import MarkdownArticle from '../../../components/MarkdownArticle';
 import { fetchServerApi } from '../../../lib/api';
 import { formatDate } from '../../../lib/content';
@@ -21,12 +22,12 @@ export async function generateMetadata({ params }) {
 
     if (!post) {
         return {
-            title: 'Post not found | Farzaan Ali Blog',
+            title: 'Post not found',
         };
     }
 
     return {
-        title: `${post.title} | Farzaan Ali Blog`,
+        title: post.title,
         description: post.excerpt,
         alternates: {
             canonical: `/posts/${post.slug}`,
@@ -57,38 +58,40 @@ export default async function PostPage({ params }) {
 
     return (
         <main className="page-shell">
-            <SiteHeader adminLink />
+            <SiteHeader />
             <article className="article-shell">
                 <header className="article-header">
-                    <div className="post-meta">
+                    <div className="article-meta">
                         <time dateTime={post.published_at}>{formatDate(post.published_at)}</time>
+                        <span>·</span>
                         <span>{post.reading_time_minutes} min read</span>
                     </div>
                     <h1 className="article-title">{post.title}</h1>
-                    {post.tags?.length ? (
-                        <div className="tag-row">
-                            {post.tags.map((tag) => (
-                                <span key={tag.slug || tag.name} className="tag">
-                                    {tag.name}
-                                </span>
-                            ))}
-                        </div>
-                    ) : null}
                 </header>
 
                 <MarkdownArticle content={post.content_markdown} />
 
                 {post.assets?.length ? (
-                    <section className="asset-list">
+                    <section className="article-resources">
+                        <span className="article-resources__label">Resources</span>
                         {post.assets.map((asset) => (
-                            <a key={asset.id || `${asset.url}-${asset.label}`} className="asset-card" href={asset.url} target="_blank" rel="noreferrer">
-                                <strong>{asset.label}</strong>
-                                <div className="muted">{asset.asset_type}</div>
+                            <a
+                                key={asset.id || `${asset.url}-${asset.label}`}
+                                className="resource-link"
+                                href={asset.url}
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                <span className="resource-link__label">{asset.label}</span>
+                                <span className="resource-link__type">{asset.asset_type}</span>
                             </a>
                         ))}
                     </section>
                 ) : null}
+
+                <a className="back-link" href="/">← All posts</a>
             </article>
+            <SiteFooter />
         </main>
     );
 }
