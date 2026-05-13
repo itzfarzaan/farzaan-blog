@@ -39,10 +39,12 @@ export default async function HomePage({ searchParams }) {
     const { posts, featured } = await getInitialData(initialTag);
 
     return (
-        <main className="page-shell">
-            <SiteHeader />
-            <HomePageClient initialPosts={posts} initialFeatured={featured} initialTag={initialTag} />
+        <>
+            <main className="page-shell">
+                <SiteHeader />
+                <HomePageClient initialPosts={posts} initialFeatured={featured} initialTag={initialTag} />
+            </main>
             <SiteFooter />
-        </main>
+        </>
     );
 }

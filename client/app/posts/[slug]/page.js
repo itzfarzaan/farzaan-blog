@@ -59,8 +59,9 @@ export default async function PostPage({ params }) {
     }
 
     return (
-        <main className="page-shell">
-            <SiteHeader />
+        <>
+            <main className="page-shell">
+                <SiteHeader />
             <article className="article-shell">
                 <header className="article-header">
                     <h1 className="article-title">{post.title}</h1>
@@ -116,7 +117,8 @@ export default async function PostPage({ params }) {
                     </footer>
                 ) : null}
             </article>
+            </main>
             <SiteFooter />
-        </main>
+        </>
     );
 }
