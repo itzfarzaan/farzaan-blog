@@ -33,7 +33,7 @@ const themeInitScript = `(function(){try{var t=localStorage.getItem('farzaan_blo
 
 export default function RootLayout({ children }) {
     return (
-        <html lang="en">
+        <html lang="en" suppressHydrationWarning>
             <head>
                 <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
             </head>

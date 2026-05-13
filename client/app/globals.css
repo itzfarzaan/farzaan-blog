@@ -6,8 +6,8 @@
   --subtle: #b4b1aa;
   --border: rgba(0, 0, 0, 0.1);
   --accent: #1a1a1a;
-  --link: #1d4ed8;
-  --link-hover: #1e3a8a;
+  --link: #1e3a8a;
+  --link-hover: #0c1d5e;
   --danger: #8c2f39;
   --max-width: 880px;
   --content-width: 720px;
@@ -149,15 +149,48 @@ button {
 
 /* Intro band */
 .intro {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.95rem;
-  padding: 0.25rem 0 1.4rem;
+  gap: 1.75rem;
+  padding: 0.75rem 0 1.75rem;
+}
+
+.intro__main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.intro__heading {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  line-height: 1.2;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: 0;
+}
+
+.intro__text {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--muted);
+  max-width: 56ch;
+}
+
+.intro__aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.7rem;
+  align-self: flex-start;
 }
 
 .intro-avatar {
-  width: 44px;
-  height: 44px;
+  width: 72px;
+  height: 72px;
   border-radius: 999px;
   object-fit: cover;
   background: var(--surface);
@@ -170,15 +203,6 @@ button {
   background: linear-gradient(135deg, var(--surface), var(--border));
 }
 
-.intro__text {
-  flex: 1;
-  margin: 0;
-  font-size: 0.94rem;
-  line-height: 1.55;
-  color: var(--muted);
-  max-width: 56ch;
-}
-
 .search-trigger {
   display: inline-flex;
   align-items: center;
@@ -187,8 +211,6 @@ button {
   height: 28px;
   color: var(--muted);
   transition: color 150ms ease;
-  flex-shrink: 0;
-  align-self: center;
 }
 
 .search-trigger:hover {
@@ -569,19 +591,24 @@ button {
   }
 
   .intro {
-    gap: 0.75rem;
-    padding-bottom: 1.1rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    padding: 0.5rem 0 1.25rem;
     align-items: flex-start;
   }
 
-  .intro-avatar {
-    width: 38px;
-    height: 38px;
+  .intro__heading {
+    font-size: 1.3rem;
   }
 
   .intro__text {
     font-size: 0.88rem;
-    line-height: 1.5;
+    line-height: 1.55;
+  }
+
+  .intro-avatar {
+    width: 56px;
+    height: 56px;
   }
 
   .post-row {

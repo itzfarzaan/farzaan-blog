@@ -1,7 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { siteConfig } from '../lib/site-config';
+
+const AVATAR_RENDER_SIZE = 144;
 
 function SearchIcon({ size = 16 }) {
     return (
@@ -15,6 +18,19 @@ function SearchIcon({ size = 16 }) {
 function Avatar({ src }) {
     const [loaded, setLoaded] = useState(false);
     const [failed, setFailed] = useState(!src);
+    const imgRef = useRef(null);
+
+    useEffect(() => {
+        const node = imgRef.current;
+        if (!node) {
+            return;
+        }
+        if (node.complete && node.naturalWidth > 0) {
+            setLoaded(true);
+        } else if (node.complete) {
+            setFailed(true);
+        }
+    }, []);
 
     if (failed) {
         return <span className="intro-avatar intro-avatar--placeholder" aria-hidden="true" />;
@@ -23,10 +39,14 @@ function Avatar({ src }) {
     return (
         <>
             {!loaded ? <span className="intro-avatar intro-avatar--placeholder" aria-hidden="true" /> : null}
-            <img
+            <Image
+                ref={imgRef}
                 className="intro-avatar"
                 src={src}
                 alt=""
+                width={AVATAR_RENDER_SIZE}
+                height={AVATAR_RENDER_SIZE}
+                priority
                 onLoad={() => setLoaded(true)}
                 onError={() => setFailed(true)}
                 style={{ display: loaded ? 'block' : 'none' }}
@@ -70,17 +90,22 @@ export default function IntroBand({ query, onQueryChange, isSearching }) {
     return (
         <>
             <section className="intro">
-                <Avatar src={siteConfig.avatarSrc} />
-                <p className="intro__text">{siteConfig.intro}</p>
-                <button
-                    type="button"
-                    className="search-trigger"
-                    onClick={toggleSearch}
-                    aria-label={isOpen ? 'Close search' : 'Open search'}
-                    aria-expanded={isOpen}
-                >
-                    <SearchIcon />
-                </button>
+                <div className="intro__main">
+                    <h2 className="intro__heading">{siteConfig.heading}</h2>
+                    <p className="intro__text">{siteConfig.intro}</p>
+                </div>
+                <div className="intro__aside">
+                    <button
+                        type="button"
+                        className="search-trigger"
+                        onClick={toggleSearch}
+                        aria-label={isOpen ? 'Close search' : 'Open search'}
+                        aria-expanded={isOpen}
+                    >
+                        <SearchIcon />
+                    </button>
+                    <Avatar src={siteConfig.avatarSrc} />
+                </div>
             </section>
 
             {isOpen ? (
