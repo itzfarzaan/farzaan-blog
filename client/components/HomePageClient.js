@@ -30,26 +30,49 @@ function FeaturedRow({ post }) {
     );
 }
 
-export default function HomePageClient({ initialPosts, initialFeatured }) {
-    const [query, setQuery] = useState('');
+const TAG_QUERY_PATTERN = /^#([\w-]+)$/;
+
+function parseSearchQuery(raw) {
+    const trimmed = raw.trim();
+    if (!trimmed) {
+        return { mode: 'idle' };
+    }
+    const match = trimmed.match(TAG_QUERY_PATTERN);
+    if (match) {
+        return { mode: 'tag', value: match[1].toLowerCase() };
+    }
+    return { mode: 'text', value: trimmed };
+}
+
+export default function HomePageClient({ initialPosts, initialFeatured, initialTag = '' }) {
+    const [query, setQuery] = useState(initialTag ? `#${initialTag}` : '');
     const [posts, setPosts] = useState(initialPosts);
     const [isSearching, setIsSearching] = useState(false);
     const [error, setError] = useState('');
 
     useEffect(() => {
         const controller = new AbortController();
+        const parsed = parseSearchQuery(query);
+        const isInitialTagQuery = parsed.mode === 'tag' && parsed.value === initialTag;
+
         const timer = setTimeout(async () => {
-            if (!query.trim()) {
+            if (parsed.mode === 'idle') {
                 setPosts(initialPosts);
                 setError('');
                 return;
             }
 
+            // Server already rendered the matching posts for the initial tag — skip the refetch.
+            if (isInitialTagQuery) {
+                return;
+            }
+
             try {
                 setIsSearching(true);
-                const response = await fetchApi(`/posts?q=${encodeURIComponent(query)}`, {
-                    signal: controller.signal,
-                });
+                const path = parsed.mode === 'tag'
+                    ? `/posts?tag=${encodeURIComponent(parsed.value)}`
+                    : `/posts?q=${encodeURIComponent(parsed.value)}`;
+                const response = await fetchApi(path, { signal: controller.signal });
                 setPosts(response.data);
                 setError('');
             } catch (fetchError) {
@@ -65,13 +88,18 @@ export default function HomePageClient({ initialPosts, initialFeatured }) {
             controller.abort();
             clearTimeout(timer);
         };
-    }, [query, initialPosts]);
+    }, [query, initialPosts, initialTag]);
 
     const isSearchActive = Boolean(query.trim());
 
     return (
         <>
-            <IntroBand query={query} onQueryChange={setQuery} isSearching={isSearching} />
+            <IntroBand
+                query={query}
+                onQueryChange={setQuery}
+                isSearching={isSearching}
+                forceOpen={Boolean(initialTag)}
+            />
 
             {error ? <div className="notice error" style={{ marginBottom: '1rem' }}>{error}</div> : null}
 
@@ -87,6 +115,12 @@ export default function HomePageClient({ initialPosts, initialFeatured }) {
                     ) : null}
                 </div>
 
+                {/*
+                  FEATURED SECTION — currently disabled.
+                  To restore: uncomment the <aside> below AND restore the two-column
+                  rule in globals.css (.home-grid). The fetch in app/page.js and the
+                  initialFeatured prop are still wired up, so no other changes needed.
+
                 <aside className="featured">
                     <span className="featured__label">Featured</span>
                     {initialFeatured.length ? (
@@ -95,6 +129,7 @@ export default function HomePageClient({ initialPosts, initialFeatured }) {
                         <span className="posts-empty">Nothing featured yet.</span>
                     )}
                 </aside>
+                */}
             </div>
         </>
     );

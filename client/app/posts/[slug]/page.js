@@ -93,6 +93,27 @@ export default async function PostPage({ params }) {
                 ) : null}
 
                 <a className="back-link" href="/">← All posts</a>
+
+                {post.tags?.length ? (
+                    <footer className="article-tags">
+                        <span className="article-tags__label">Tagged</span>
+                        <div className="article-tags__list">
+                            {post.tags.map((tag, index) => (
+                                <span key={tag.slug || tag.name}>
+                                    <a
+                                        className="article-tags__link"
+                                        href={`/?tag=${encodeURIComponent(tag.slug || tag.name)}`}
+                                    >
+                                        {tag.name}
+                                    </a>
+                                    {index < post.tags.length - 1 ? (
+                                        <span className="article-tags__sep" aria-hidden="true"> · </span>
+                                    ) : null}
+                                </span>
+                            ))}
+                        </div>
+                    </footer>
+                ) : null}
             </article>
             <SiteFooter />
         </main>

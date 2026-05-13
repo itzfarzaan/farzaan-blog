@@ -5,10 +5,19 @@ import { fetchServerApi } from '../lib/api';
 
 export const revalidate = 60;
 
-async function getInitialData() {
+function normalizeTag(value) {
+    if (!value) {
+        return '';
+    }
+    const raw = Array.isArray(value) ? value[0] : value;
+    return String(raw).trim().toLowerCase();
+}
+
+async function getInitialData(tag) {
     try {
+        const postsPath = tag ? `/posts?tag=${encodeURIComponent(tag)}` : '/posts';
         const [postsResponse, featuredResponse] = await Promise.all([
-            fetchServerApi('/posts'),
+            fetchServerApi(postsPath),
             fetchServerApi('/posts?featured=true'),
         ]);
 
@@ -24,13 +33,15 @@ async function getInitialData() {
     }
 }
 
-export default async function HomePage() {
-    const { posts, featured } = await getInitialData();
+export default async function HomePage({ searchParams }) {
+    const resolvedSearchParams = (await searchParams) || {};
+    const initialTag = normalizeTag(resolvedSearchParams.tag);
+    const { posts, featured } = await getInitialData(initialTag);
 
     return (
         <main className="page-shell">
             <SiteHeader />
-            <HomePageClient initialPosts={posts} initialFeatured={featured} />
+            <HomePageClient initialPosts={posts} initialFeatured={featured} initialTag={initialTag} />
             <SiteFooter />
         </main>
     );

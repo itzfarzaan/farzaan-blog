@@ -296,7 +296,17 @@ async function fetchPostBySlug(slug, includeDrafts = false) {
     return mapPostRow(result.rows[0]);
 }
 
-async function listPublishedPosts({ q = '', featured = false }) {
+function buildPrefixTsQuery(input) {
+    return input
+        .toLowerCase()
+        .split(/\s+/)
+        .map((word) => word.replace(/[^a-z0-9]/g, ''))
+        .filter((word) => word.length > 0)
+        .map((word) => `${word}:*`)
+        .join(' & ');
+}
+
+async function listPublishedPosts({ q = '', featured = false, tag = '' }) {
     const values = ['published'];
     const conditions = ['p.status = $1'];
 
@@ -305,15 +315,27 @@ async function listPublishedPosts({ q = '', featured = false }) {
         conditions.push(`p.is_featured = $${values.length}`);
     }
 
-    if (q.trim()) {
-        values.push(q.trim());
-        conditions.push(`p.search_vector @@ websearch_to_tsquery('english', $${values.length})`);
+    const tsQuery = q.trim() ? buildPrefixTsQuery(q) : '';
+    let tsQueryIndex = null;
+    if (tsQuery) {
+        values.push(tsQuery);
+        tsQueryIndex = values.length;
+        conditions.push(`p.search_vector @@ to_tsquery('english', $${tsQueryIndex})`);
     }
 
-    const searchRank = q.trim()
-        ? `ts_rank(p.search_vector, websearch_to_tsquery('english', $${values.length})) AS rank,`
+    if (tag.trim()) {
+        values.push(tag.trim().toLowerCase());
+        conditions.push(`EXISTS (
+            SELECT 1 FROM post_tags pt_filter
+            JOIN tags t_filter ON t_filter.id = pt_filter.tag_id
+            WHERE pt_filter.post_id = p.id AND t_filter.slug = $${values.length}
+        )`);
+    }
+
+    const searchRank = tsQueryIndex
+        ? `ts_rank(p.search_vector, to_tsquery('english', $${tsQueryIndex})) AS rank,`
         : '';
-    const orderBy = q.trim() ? 'rank DESC, p.published_at DESC' : 'p.published_at DESC';
+    const orderBy = tsQueryIndex ? 'rank DESC, p.published_at DESC' : 'p.published_at DESC';
 
     const result = await pool.query(
         `
@@ -418,7 +440,22 @@ async function unpublishPost(postId) {
     return fetchPostById(postId, true);
 }
 
-async function listPublicTags() {
+async function listPublicTags({ prefix = '', limit = null } = {}) {
+    const values = [];
+    const conditions = ["p.status = 'published'"];
+
+    if (prefix.trim()) {
+        const safe = prefix.trim().toLowerCase().replace(/[%_]/g, '\\$&');
+        values.push(`${safe}%`);
+        conditions.push(`(LOWER(t.slug) LIKE $${values.length} OR LOWER(t.name) LIKE $${values.length})`);
+    }
+
+    let limitClause = '';
+    if (Number.isInteger(limit) && limit > 0) {
+        values.push(limit);
+        limitClause = `LIMIT $${values.length}`;
+    }
+
     const result = await pool.query(
         `
         SELECT
@@ -429,10 +466,12 @@ async function listPublicTags() {
         FROM tags t
         JOIN post_tags pt ON pt.tag_id = t.id
         JOIN posts p ON p.id = pt.post_id
-        WHERE p.status = 'published'
+        WHERE ${conditions.join(' AND ')}
         GROUP BY t.id
-        ORDER BY t.name ASC
-        `
+        ORDER BY post_count DESC, t.name ASC
+        ${limitClause}
+        `,
+        values
     );
 
     return result.rows;
