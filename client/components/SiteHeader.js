@@ -4,7 +4,7 @@ import { siteConfig } from '../lib/site-config';
 export default function SiteHeader() {
     return (
         <header className="navbar">
-            <a className="navbar__brand" href="/">{siteConfig.name}</a>
+            <a className="navbar__brand" href="/">{siteConfig.brand}</a>
             <nav className="navbar__right">
                 <a className="navbar__link" href={siteConfig.portfolioUrl} target="_blank" rel="noreferrer">
                     Portfolio

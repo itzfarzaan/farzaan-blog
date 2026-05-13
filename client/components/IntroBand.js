@@ -90,22 +90,20 @@ export default function IntroBand({ query, onQueryChange, isSearching }) {
     return (
         <>
             <section className="intro">
+                <Avatar src={siteConfig.avatarSrc} />
                 <div className="intro__main">
                     <h2 className="intro__heading">{siteConfig.heading}</h2>
                     <p className="intro__text">{siteConfig.intro}</p>
                 </div>
-                <div className="intro__aside">
-                    <button
-                        type="button"
-                        className="search-trigger"
-                        onClick={toggleSearch}
-                        aria-label={isOpen ? 'Close search' : 'Open search'}
-                        aria-expanded={isOpen}
-                    >
-                        <SearchIcon />
-                    </button>
-                    <Avatar src={siteConfig.avatarSrc} />
-                </div>
+                <button
+                    type="button"
+                    className="search-trigger"
+                    onClick={toggleSearch}
+                    aria-label={isOpen ? 'Close search' : 'Open search'}
+                    aria-expanded={isOpen}
+                >
+                    <SearchIcon />
+                </button>
             </section>
 
             {isOpen ? (

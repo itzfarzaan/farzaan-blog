@@ -1,5 +1,6 @@
 export const siteConfig = {
     name: 'Farzaan Ali',
+    brand: "Farzaan's Notes",
     heading: 'Hi, I am Farzaan Ali',
     intro: 'These are the blogs I write whenever I come across fascinating topics, ideas, and the occasional rabbit hole worth keeping.',
     avatarSrc: '/avatar.png',
