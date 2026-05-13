@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import IntroBand from './IntroBand';
 import { fetchApi } from '../lib/api';
-import { formatDate } from '../lib/content';
+import { formatDate, readingPhrase } from '../lib/content';
 
 function PostRow({ post }) {
     return (
@@ -13,7 +13,7 @@ function PostRow({ post }) {
             </time>
             <div className="post-row__body">
                 <a className="post-row__title" href={`/posts/${post.slug}`}>{post.title}</a>
-                <span className="post-row__meta">a {post.reading_time_minutes} minute{post.reading_time_minutes === 1 ? '' : 's'} read</span>
+                <span className="post-row__meta">{readingPhrase(post.reading_time_minutes)}</span>
             </div>
         </article>
     );

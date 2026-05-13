@@ -1,5 +1,21 @@
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+export function readingPhrase(minutes) {
+    if (!minutes || minutes <= 0) {
+        return '';
+    }
+    if (minutes <= 2) {
+        return `${minutes} min · quick read`;
+    }
+    if (minutes <= 6) {
+        return `${minutes} min · short read`;
+    }
+    if (minutes <= 15) {
+        return `${minutes} min · medium read`;
+    }
+    return `${minutes} min · long read`;
+}
+
 export function formatDate(value) {
     if (!value) {
         return 'Unpublished';
