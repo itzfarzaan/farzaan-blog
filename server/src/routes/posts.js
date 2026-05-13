@@ -11,6 +11,7 @@ router.get('/', async (req, res, next) => {
         const posts = await listPublishedPosts({
             q: req.query.q || '',
             featured: req.query.featured === 'true',
+            tag: req.query.tag || '',
         });
 
         res.json({
