@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchApi } from '../../../lib/api';
 import { setToken } from '../../../lib/admin-auth';
+import AdminNavbar from '../../../components/admin/AdminNavbar';
 
 export default function AdminLoginPage() {
     const router = useRouter();
@@ -29,45 +30,47 @@ export default function AdminLoginPage() {
             setToken(response.token);
             router.replace('/admin/posts');
         } catch (loginError) {
-            setError(loginError.message);
+            setError(loginError.message || 'Sign-in failed. Try again.');
         } finally {
             setLoading(false);
         }
     }
 
     return (
-        <main className="admin-shell">
-            <div className="editor-card" style={{ maxWidth: 540, margin: '6rem auto 0' }}>
-                <div className="stack">
-                    <div>
-                        <div className="muted">Admin access</div>
-                        <h1 style={{ margin: '0.3rem 0 0' }}>Sign in to the blog CMS</h1>
-                    </div>
+        <div className="admin-shell">
+            <AdminNavbar minimal />
+            <main className="login-shell">
+                <form className="login-form" onSubmit={handleSubmit} noValidate>
+                <label className="login-form__field">
+                    <span>Username</span>
+                    <input
+                        className="input"
+                        autoComplete="username"
+                        value={username}
+                        onChange={(event) => setUsername(event.target.value)}
+                        required
+                    />
+                </label>
 
-                    {error ? <div className="notice error">{error}</div> : null}
+                <label className="login-form__field">
+                    <span>Password</span>
+                    <input
+                        className="input"
+                        type="password"
+                        autoComplete="current-password"
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
+                        required
+                    />
+                </label>
 
-                    <form className="form-grid" onSubmit={handleSubmit}>
-                        <label>
-                            Username
-                            <input className="input" value={username} onChange={(event) => setUsername(event.target.value)} />
-                        </label>
+                {error ? <div className="login-form__error" role="alert">{error}</div> : null}
 
-                        <label>
-                            Password
-                            <input
-                                className="input"
-                                type="password"
-                                value={password}
-                                onChange={(event) => setPassword(event.target.value)}
-                            />
-                        </label>
-
-                        <button className="button" type="submit" disabled={loading}>
-                            {loading ? 'Signing in...' : 'Sign in'}
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </main>
+                <button className="button" type="submit" disabled={loading}>
+                    {loading ? 'Signing in…' : 'Sign in'}
+                </button>
+                </form>
+            </main>
+        </div>
     );
 }
