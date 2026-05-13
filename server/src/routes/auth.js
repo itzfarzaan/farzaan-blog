@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { validateLogin } = require('../middleware/validation');
-const { authenticateToken } = require('../middleware/auth');
+const { authenticateToken, cookieOptionsForAuth, AUTH_COOKIE_NAME } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -31,14 +31,20 @@ router.post('/login', validateLogin, async (req, res, next) => {
             { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
         );
 
+        res.cookie(AUTH_COOKIE_NAME, token, cookieOptionsForAuth());
+
         return res.json({
             success: true,
-            token,
             user: { username },
         });
     } catch (error) {
         next(error);
     }
+});
+
+router.post('/logout', (req, res) => {
+    res.clearCookie(AUTH_COOKIE_NAME, { ...cookieOptionsForAuth(), maxAge: undefined });
+    return res.json({ success: true });
 });
 
 router.get('/me', authenticateToken, (req, res) => {

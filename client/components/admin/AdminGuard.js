@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { clearToken, getToken } from '../../lib/admin-auth';
 import { fetchApi } from '../../lib/api';
 
 export default function AdminGuard({ children }) {
@@ -10,29 +9,27 @@ export default function AdminGuard({ children }) {
     const [status, setStatus] = useState('checking');
 
     useEffect(() => {
-        const token = getToken();
-
-        if (!token) {
-            router.replace('/admin/login');
-            return;
-        }
-
-        fetchApi('/auth/me', {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        })
-            .then(() => setStatus('ready'))
+        let cancelled = false;
+        fetchApi('/auth/me')
+            .then(() => {
+                if (!cancelled) {
+                    setStatus('ready');
+                }
+            })
             .catch(() => {
-                clearToken();
-                router.replace('/admin/login');
+                if (!cancelled) {
+                    router.replace('/admin/login');
+                }
             });
+        return () => {
+            cancelled = true;
+        };
     }, [router]);
 
     if (status !== 'ready') {
         return (
             <div className="admin-shell">
-                <div className="panel">Checking your admin session...</div>
+                <div className="admin-empty">Checking your admin session…</div>
             </div>
         );
     }

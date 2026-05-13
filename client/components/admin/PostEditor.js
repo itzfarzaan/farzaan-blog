@@ -3,7 +3,6 @@
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { clearToken, getToken } from '../../lib/admin-auth';
 import { fetchApi } from '../../lib/api';
 import { buildExcerpt, slugify } from '../../lib/content';
 
@@ -51,17 +50,7 @@ export default function PostEditor({ postId = null }) {
             return;
         }
 
-        const token = getToken();
-        if (!token) {
-            router.replace('/admin/login');
-            return;
-        }
-
-        fetchApi(`/admin/posts/${postId}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        })
+        fetchApi(`/admin/posts/${postId}`)
             .then((response) => {
                 const next = normalizeIncomingPost(response.data);
                 setForm(next);
@@ -69,7 +58,6 @@ export default function PostEditor({ postId = null }) {
             })
             .catch((fetchError) => {
                 if (fetchError.message === 'Session expired') {
-                    clearToken();
                     router.replace('/admin/login');
                     return;
                 }
@@ -153,12 +141,6 @@ export default function PostEditor({ postId = null }) {
     }
 
     async function save() {
-        const token = getToken();
-        if (!token) {
-            router.replace('/admin/login');
-            return;
-        }
-
         const tags = form.tagsInput
             .split(',')
             .map((tag) => tag.trim())
@@ -187,7 +169,6 @@ export default function PostEditor({ postId = null }) {
                 method: postId ? 'PUT' : 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify(payload),
             });
@@ -202,7 +183,6 @@ export default function PostEditor({ postId = null }) {
             }
         } catch (saveError) {
             if (saveError.message === 'Session expired') {
-                clearToken();
                 router.replace('/admin/login');
                 return;
             }

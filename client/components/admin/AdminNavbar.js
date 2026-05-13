@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import ThemeToggle from '../ThemeToggle';
-import { clearToken } from '../../lib/admin-auth';
+import { signOut } from '../../lib/admin-auth';
 import { siteConfig } from '../../lib/site-config';
 
 function NavLink({ href, label, active }) {
@@ -25,8 +25,8 @@ export default function AdminNavbar({ minimal = false }) {
     const pathname = usePathname() || '';
     const router = useRouter();
 
-    function handleSignOut() {
-        clearToken();
+    async function handleSignOut() {
+        await signOut();
         router.replace('/admin/login');
     }
 

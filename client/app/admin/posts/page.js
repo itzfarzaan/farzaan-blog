@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import AdminGuard from '../../../components/admin/AdminGuard';
 import AdminNavbar from '../../../components/admin/AdminNavbar';
-import { clearToken, getToken } from '../../../lib/admin-auth';
 import { fetchApi } from '../../../lib/api';
 import { formatDate } from '../../../lib/content';
 
@@ -15,20 +14,10 @@ export default function AdminPostsPage() {
     const [page, setPage] = useState(1);
 
     useEffect(() => {
-        const token = getToken();
-        if (!token) {
-            return;
-        }
-
-        fetchApi('/admin/posts', {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        })
+        fetchApi('/admin/posts')
             .then((response) => setPosts(response.data))
             .catch((fetchError) => {
                 if (fetchError.message === 'Session expired') {
-                    clearToken();
                     window.location.href = '/admin/login';
                     return;
                 }
