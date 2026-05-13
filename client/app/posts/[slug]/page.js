@@ -1,6 +1,7 @@
 import SiteHeader from '../../../components/SiteHeader';
 import SiteFooter from '../../../components/SiteFooter';
 import MarkdownArticle from '../../../components/MarkdownArticle';
+import ResourceIcon from '../../../components/ResourceIcon';
 import { fetchServerApi } from '../../../lib/api';
 import { formatDate } from '../../../lib/content';
 import { siteConfig } from '../../../lib/site-config';
@@ -86,7 +87,7 @@ export default async function PostPage({ params }) {
                                 rel="noreferrer"
                             >
                                 <span className="resource-link__label">{asset.label}</span>
-                                <span className="resource-link__type">{asset.asset_type}</span>
+                                <ResourceIcon type={asset.asset_type} />
                             </a>
                         ))}
                     </section>

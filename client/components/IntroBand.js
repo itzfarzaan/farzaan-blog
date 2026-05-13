@@ -144,14 +144,12 @@ export default function IntroBand({ query, onQueryChange, isSearching, forceOpen
     }, [suggestions.length]);
 
     function toggleSearch() {
-        setIsOpen((current) => {
-            const next = !current;
-            if (!next) {
-                onQueryChange('');
-                setSuggestions([]);
-            }
-            return next;
-        });
+        const next = !isOpen;
+        setIsOpen(next);
+        if (!next) {
+            onQueryChange('');
+            setSuggestions([]);
+        }
     }
 
     function selectSuggestion(tag) {
