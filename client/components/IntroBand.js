@@ -12,9 +12,31 @@ function SearchIcon({ size = 16 }) {
     );
 }
 
+function Avatar({ src }) {
+    const [loaded, setLoaded] = useState(false);
+    const [failed, setFailed] = useState(!src);
+
+    if (failed) {
+        return <span className="intro-avatar intro-avatar--placeholder" aria-hidden="true" />;
+    }
+
+    return (
+        <>
+            {!loaded ? <span className="intro-avatar intro-avatar--placeholder" aria-hidden="true" /> : null}
+            <img
+                className="intro-avatar"
+                src={src}
+                alt=""
+                onLoad={() => setLoaded(true)}
+                onError={() => setFailed(true)}
+                style={{ display: loaded ? 'block' : 'none' }}
+            />
+        </>
+    );
+}
+
 export default function IntroBand({ query, onQueryChange, isSearching }) {
     const [isOpen, setIsOpen] = useState(false);
-    const [avatarBroken, setAvatarBroken] = useState(false);
     const inputRef = useRef(null);
 
     useEffect(() => {
@@ -48,23 +70,8 @@ export default function IntroBand({ query, onQueryChange, isSearching }) {
     return (
         <>
             <section className="intro">
-                <div className="intro__left">
-                    <span className="intro__hi">{siteConfig.intro}</span>
-                    <span className="intro__divider" aria-hidden="true" />
-                    <span className="intro__card">
-                        {siteConfig.avatarSrc && !avatarBroken ? (
-                            <img
-                                className="intro__avatar"
-                                src={siteConfig.avatarSrc}
-                                alt=""
-                                onError={() => setAvatarBroken(true)}
-                            />
-                        ) : (
-                            <span className="intro__avatar intro__avatar--placeholder" aria-hidden="true" />
-                        )}
-                        <span>{siteConfig.tagline}</span>
-                    </span>
-                </div>
+                <Avatar src={siteConfig.avatarSrc} />
+                <p className="intro__text">{siteConfig.intro}</p>
                 <button
                     type="button"
                     className="search-trigger"

@@ -3,6 +3,7 @@ import SiteFooter from '../../../components/SiteFooter';
 import MarkdownArticle from '../../../components/MarkdownArticle';
 import { fetchServerApi } from '../../../lib/api';
 import { formatDate } from '../../../lib/content';
+import { siteConfig } from '../../../lib/site-config';
 import { notFound } from 'next/navigation';
 
 export const revalidate = 60;
@@ -61,12 +62,14 @@ export default async function PostPage({ params }) {
             <SiteHeader />
             <article className="article-shell">
                 <header className="article-header">
+                    <h1 className="article-title">{post.title}</h1>
                     <div className="article-meta">
                         <time dateTime={post.published_at}>{formatDate(post.published_at)}</time>
-                        <span>·</span>
+                        <span aria-hidden="true">·</span>
+                        <span>{siteConfig.name}</span>
+                        <span aria-hidden="true">·</span>
                         <span>{post.reading_time_minutes} min read</span>
                     </div>
-                    <h1 className="article-title">{post.title}</h1>
                 </header>
 
                 <MarkdownArticle content={post.content_markdown} />
