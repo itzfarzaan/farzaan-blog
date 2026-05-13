@@ -534,15 +534,15 @@ button {
 }
 
 .article-body {
-  font-size: clamp(1rem, 0.97rem + 0.1vw, 1.1rem);
-  line-height: 1.7;
+  font-size: 1rem;
+  line-height: 1.5;
   overflow-wrap: break-word;
 }
 
 .article-body p,
 .article-body li,
 .article-body blockquote {
-  line-height: 1.8;
+  line-height: 1.5;
 }
 
 .article-body a {
