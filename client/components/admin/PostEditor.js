@@ -17,10 +17,29 @@ function emptyForm() {
         excerpt: '',
         content_markdown: '',
         status: 'draft',
+        published_at: '',
         is_featured: false,
         tagsInput: '',
         assets: [],
     };
+}
+
+function toDateTimeLocal(value) {
+    if (!value) {
+        return '';
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+        return '';
+    }
+
+    const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+    return localDate.toISOString().slice(0, 16);
+}
+
+function fromDateTimeLocal(value) {
+    return value ? new Date(value).toISOString() : null;
 }
 
 function normalizeIncomingPost(post) {
@@ -30,6 +49,7 @@ function normalizeIncomingPost(post) {
         excerpt: post?.excerpt || '',
         content_markdown: post?.content_markdown || '',
         status: post?.status || 'draft',
+        published_at: toDateTimeLocal(post?.published_at),
         is_featured: Boolean(post?.is_featured),
         tagsInput: (post?.tags || []).map((tag) => tag.name || tag).join(', '),
         assets: post?.assets || [],
@@ -152,6 +172,7 @@ export default function PostEditor({ postId = null }) {
             excerpt: form.excerpt,
             content_markdown: form.content_markdown,
             status: form.status,
+            published_at: form.status === 'published' ? fromDateTimeLocal(form.published_at) : null,
             is_featured: form.is_featured,
             tags,
             assets: form.assets.map((asset, index) => ({
@@ -193,6 +214,38 @@ export default function PostEditor({ postId = null }) {
         }
     }
 
+    async function deletePost() {
+        if (!postId) {
+            return;
+        }
+
+        if (!window.confirm('Delete this post permanently?')) {
+            return;
+        }
+
+        try {
+            setSaving(true);
+            setError('');
+            setNotice('');
+
+            await fetchApi(`/admin/posts/${postId}`, {
+                method: 'DELETE',
+            });
+
+            setSavedForm(form);
+            router.replace('/admin/posts');
+        } catch (deleteError) {
+            if (deleteError.message === 'Session expired') {
+                router.replace('/admin/login');
+                return;
+            }
+
+            setError(deleteError.message);
+        } finally {
+            setSaving(false);
+        }
+    }
+
     function handleBack() {
         if (isDirty && !window.confirm('You have unsaved changes. Discard and leave?')) {
             return;
@@ -226,6 +279,11 @@ export default function PostEditor({ postId = null }) {
                     <button className="button" type="button" onClick={save} disabled={saving}>
                         {saving ? 'Saving…' : 'Save'}
                     </button>
+                    {postId ? (
+                        <button className="button button--danger" type="button" onClick={deletePost} disabled={saving}>
+                            Delete
+                        </button>
+                    ) : null}
                 </div>
             </div>
 
@@ -284,6 +342,17 @@ export default function PostEditor({ postId = null }) {
                             onChange={(event) => updateField('is_featured', event.target.checked)}
                         />
                         <span>Feature on homepage</span>
+                    </label>
+
+                    <label className="editor__field">
+                        <span>Published date</span>
+                        <input
+                            className="input"
+                            type="datetime-local"
+                            value={form.published_at}
+                            onChange={(event) => updateField('published_at', event.target.value)}
+                            disabled={form.status !== 'published'}
+                        />
                     </label>
 
                     <div className="editor__field">

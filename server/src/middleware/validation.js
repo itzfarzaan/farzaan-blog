@@ -22,6 +22,11 @@ function validateField(key, value, fieldDef) {
             return typeof value === 'boolean' ? null : `${key} must be a boolean`;
         case 'int':
             return Number.isInteger(value) ? null : `${key} must be an integer`;
+        case 'timestamp':
+            if (typeof value !== 'string' || Number.isNaN(Date.parse(value))) {
+                return `${key} must be a valid timestamp`;
+            }
+            return null;
         case 'array':
             if (!Array.isArray(value)) {
                 return `${key} must be an array`;

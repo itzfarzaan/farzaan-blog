@@ -566,9 +566,11 @@ button {
   overflow-x: auto;
   padding: 1rem;
   border-radius: 4px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: #f6f8fa;
+  border: 1px solid #d0d7de;
+  color: #24292f;
   font-size: 0.92rem;
+  line-height: 1.45;
 }
 
 .article-body code {
@@ -577,11 +579,32 @@ button {
   font-size: 0.92em;
 }
 
+.article-body pre code,
+.article-body pre .hljs {
+  display: block;
+  overflow-x: auto;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
 .article-body :not(pre) > code {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: rgba(175, 184, 193, 0.2);
+  border: 0;
   padding: 0.05rem 0.35rem;
   border-radius: 3px;
+  color: #24292f;
+}
+
+[data-theme="dark"] .article-body pre {
+  background: #0d1117;
+  border-color: #30363d;
+  color: #c9d1d9;
+}
+
+[data-theme="dark"] .article-body :not(pre) > code {
+  background: rgba(110, 118, 129, 0.4);
+  color: #c9d1d9;
 }
 
 .article-body table {
@@ -840,6 +863,11 @@ button {
 
 .button:hover {
   opacity: 0.86;
+}
+
+.button--danger {
+  background: var(--danger);
+  color: #ffffff;
 }
 
 .button:disabled {
@@ -1239,6 +1267,86 @@ button {
 
 .editor__content {
   min-width: 0;
+}
+
+/* Skeleton loading */
+
+.skeleton-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1rem 0 3rem;
+}
+
+.skeleton-page--admin {
+  padding-top: 2rem;
+}
+
+.skeleton-line,
+.skeleton-block,
+.skeleton-row {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.skeleton-line::after,
+.skeleton-block::after,
+.skeleton-row::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  animation: skeleton-shimmer 1.2s ease-in-out infinite;
+}
+
+[data-theme="dark"] .skeleton-line::after,
+[data-theme="dark"] .skeleton-block::after,
+[data-theme="dark"] .skeleton-row::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+}
+
+.skeleton-line {
+  height: 0.9rem;
+  width: 64%;
+}
+
+.skeleton-line--short {
+  width: 26%;
+}
+
+.skeleton-line--title {
+  height: 2.1rem;
+  width: 72%;
+}
+
+.skeleton-line--wide {
+  width: 86%;
+}
+
+.skeleton-block {
+  height: 7rem;
+  margin: 0.4rem 0;
+}
+
+.skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 0.5rem;
+}
+
+.skeleton-row {
+  height: 3.4rem;
+}
+
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 @media (max-width: 1024px) {

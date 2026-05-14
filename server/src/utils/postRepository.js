@@ -8,6 +8,7 @@ function normalizePostInput(body) {
     const excerpt = String(body.excerpt || '').trim();
     const contentMarkdown = String(body.content_markdown || '').trim();
     const status = body.status === 'published' ? 'published' : 'draft';
+    const publishedAt = body.published_at ? new Date(body.published_at) : null;
     const isFeatured = Boolean(body.is_featured);
     const tags = uniqueTrimmed(body.tags);
     const assets = (body.assets || []).map((asset, index) => ({
@@ -39,6 +40,7 @@ function normalizePostInput(body) {
         excerpt,
         contentMarkdown,
         status,
+        publishedAt,
         isFeatured,
         tags,
         assets,
@@ -113,7 +115,9 @@ async function createPost(body) {
     try {
         await client.query('BEGIN');
 
-        const publishedAt = normalized.status === 'published' ? new Date() : null;
+        const publishedAt = normalized.status === 'published'
+            ? (normalized.publishedAt || new Date())
+            : null;
         const result = await client.query(
             `
             INSERT INTO posts (
@@ -170,9 +174,8 @@ async function updatePost(postId, body) {
             throw error;
         }
 
-        const current = existing.rows[0];
         const publishedAt = normalized.status === 'published'
-            ? (current.published_at || new Date())
+            ? (normalized.publishedAt || new Date())
             : null;
 
         await client.query(
@@ -418,6 +421,22 @@ async function publishPost(postId) {
     return fetchPostById(postId, true);
 }
 
+async function deletePost(postId) {
+    const result = await pool.query(
+        'DELETE FROM posts WHERE id = $1 RETURNING id',
+        [postId]
+    );
+
+    if (!result.rows.length) {
+        const error = new Error('Post not found');
+        error.statusCode = 404;
+        error.publicMessage = 'Post not found.';
+        throw error;
+    }
+
+    return result.rows[0];
+}
+
 async function unpublishPost(postId) {
     const result = await pool.query(
         `
@@ -485,6 +504,7 @@ module.exports = {
     listPublishedPosts,
     listAdminPosts,
     publishPost,
+    deletePost,
     unpublishPost,
     listPublicTags,
 };

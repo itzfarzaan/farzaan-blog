@@ -8,6 +8,7 @@ const postWrite = {
         excerpt: { type: 'text', required: true },
         content_markdown: { type: 'text', required: true },
         status: { type: 'text', check: POST_STATUSES },
+        published_at: { type: 'timestamp' },
         is_featured: { type: 'boolean' },
         tags: { type: 'array', itemType: 'text' },
         assets: {

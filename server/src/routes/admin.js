@@ -7,6 +7,7 @@ const {
     listAdminPosts,
     publishPost,
     unpublishPost,
+    deletePost,
 } = require('../utils/postRepository');
 
 const router = express.Router();
@@ -87,6 +88,18 @@ router.post('/posts/:id/publish', async (req, res, next) => {
         res.json({
             success: true,
             data: post,
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.delete('/posts/:id', async (req, res, next) => {
+    try {
+        await deletePost(req.params.id);
+        res.json({
+            success: true,
+            message: 'Post deleted.',
         });
     } catch (error) {
         next(error);
