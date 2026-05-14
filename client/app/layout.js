@@ -39,9 +39,10 @@ export const metadata = {
 export const viewport = {
     width: 'device-width',
     initialScale: 1,
+    colorScheme: 'light',
 };
 
-const themeInitScript = `(function(){try{var t=localStorage.getItem('farzaan_blog_theme');if(!t){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();`;
+const themeInitScript = `(function(){try{var t=localStorage.getItem('farzaan_blog_theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');}else{document.documentElement.removeAttribute('data-theme');}}catch(e){}})();`;
 
 export default function RootLayout({ children }) {
     return (
