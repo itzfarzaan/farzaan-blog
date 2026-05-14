@@ -7,6 +7,18 @@ export const metadata = {
     metadataBase: new URL(siteUrl),
     title: 'Farzaan Ali',
     description: 'Notes and essays by Farzaan Ali.',
+    manifest: '/site.webmanifest',
+    icons: {
+        icon: [
+            { url: '/favicon.ico' },
+            { url: '/favicon.svg', type: 'image/svg+xml' },
+            { url: '/favicon-96x96.png', type: 'image/png', sizes: '96x96' },
+        ],
+        shortcut: '/favicon.ico',
+        apple: [
+            { url: '/apple-touch-icon.png', sizes: '180x180' },
+        ],
+    },
     alternates: {
         canonical: '/',
     },

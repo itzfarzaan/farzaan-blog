@@ -13,6 +13,7 @@
   --max-width: 880px;
   --content-width: 720px;
   --font-body: Georgia, "Times New Roman", serif;
+  --font-reading: Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif;
   --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 }
@@ -534,6 +535,7 @@ button {
 }
 
 .article-body {
+  font-family: var(--font-reading);
   font-size: 1rem;
   line-height: 1.5;
   overflow-wrap: break-word;
